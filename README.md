@@ -34,7 +34,7 @@ by site.
 Filters → DNS blocklists → Add blocklist → point at the raw URL:
 
 ```
-https://raw.githubusercontent.com/<your-username>/<repo-name>/main/blocklist.txt
+https://raw.githubusercontent.com/wybotz/site-adblock-gaps/main/blocklist.txt
 ```
 
 AdGuard Home will then refresh it on its normal filter-update schedule,

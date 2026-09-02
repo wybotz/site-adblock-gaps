@@ -1,0 +1,62 @@
+! Supplementary ad/tracker blocklist — gaps not covered by EasyList,
+! EasyPrivacy, or the AdGuard DNS filter, found by surveying specific
+! sites' "Accept all" consent flow and watching real network traffic.
+!
+! Maintained by: Tobias
+! Source repo: (fill in once pushed)
+!
+! Syntax: standard Adblock Plus / uBlock Origin / AdGuard domain-blocking
+! syntax (||domain^). AdGuard Home accepts this file directly as a
+! subscribed blocklist (Filters -> DNS blocklists -> Add blocklist ->
+! point at the raw GitHub URL).
+!
+! See SURVEY_METHOD.md in this repo for how each site was checked and
+! how to add a new one.
+
+! =====================================================================
+! SvD (Schibsted) — svd.se
+! Verified: 2 September 2026
+! =====================================================================
+
+! SvD / Schibsted's own ad-serving infrastructure. Note: the standard
+! lists DO cover several OTHER Schibsted tracking domains (e.g.
+! collector.schibsted.io, dc.schibsted.io, sdk.pulse.schibsted.io,
+! cis.schibsted.com) — this isn't a blind spot about Schibsted
+! generally, just these two specific ad-serving hosts.
+||ads.inventory.schibsted.io^
+||cogwheel.inventory.schibsted.io^
+
+! Already covered elsewhere, no action needed (kept here for the record):
+! adsdk.microsoft.com            -> covered (||adsdk.microsoft.com^)
+
+! =====================================================================
+! The Guardian — theguardian.com
+! Verified: 2 September 2026
+! =====================================================================
+
+! The Guardian's header-bidding wrapper.
+||privacymanager.io^
+
+! comScore's beacon domain — genuinely absent from all lists checked,
+! notable since this is one of the oldest, most common tracker domains
+! on the web. Note: the AdGuard DNS filter contains a near-miss,
+! "sb.scorecard.research.com" (extra dot before "research") — that's a
+! different domain from the real "sb.scorecardresearch.com" and
+! doesn't match it, most likely a long-standing typo upstream.
+||scorecardresearch.com^
+
+! Already covered elsewhere, no action needed (kept here for the record):
+! a.teads.tv                     -> covered via ||teads.tv^
+! amazon-adsystem.com            -> covered (||amazon-adsystem.com^)
+! confiant-integrations.net      -> covered (||confiant-integrations.net^)
+! id5-sync.com                   -> covered (||id5-sync.com^, ||eu-1-id5-sync.com^)
+! secure.cdn.fastclick.net       -> covered via ||fastclick.net^
+! securepubads.g.doubleclick.net -> covered via ||doubleclick.net^
+!   (note: a few specific doubleclick.net subdomains, e.g. pagead.l. and
+!   www3., have explicit @@ allow-exceptions in these lists — not the
+!   one used here, but worth knowing these lists do carve out exceptions)
+
+! =====================================================================
+! [next site] — add here, same format: domain header, verified date,
+! genuine gaps as active rules, already-covered domains as comments.
+! =====================================================================

@@ -45,6 +45,30 @@ Python 3.9, so tasks 2–5 have to happen on rimmer.
 - **Still open:** tasks 2–6. Task 6 means `AGENTS.md` and
   `SURVEY_METHOD.md`; only the gapcheck README was updated.
 
+## Progress (2026-10-07, third Claude Code session on rimmer)
+
+Task 5 finished; all pending decisions made. Committed, not pushed.
+
+- Tobias's calls: `www.googletagmanager.com` and `www.googleadservices.com`
+  are **not blocked**; marked `kind = "infrastructure"` with a "not blocked by
+  decision" note so gapcheck stops proposing them.
+- `imasdk.googleapis.com`, `c.2mdn.net`, `gcdn.2mdn.net` added in a separate,
+  documented "Video ads" section (no domain in its header, so gapcheck never
+  places rules there). Playback tested in the gapcheck image, today's rules vs.
+  today's rules + section: DN (screen9, loads ima3.js), Aftonbladet TV and
+  YouTube (watch + embed, pre-roll included) play identically; YouTube never
+  requests these hosts. Untested: TV/streaming apps (TV4 Play, Plex, ...).
+- `choices.trustarc.com` / `choices.truste.com` added (Guardian section): only
+  requested after consent, inside Trade Desk ad frames (AdChoices icon + /cap
+  pixel); Accept still works with both blocked. Never `||trustarc.com^`:
+  `consent.trustarc.com` is a CMP on other sites.
+- Probe scripts lived in the session scratchpad (not committed): playback test
+  with a route-based DNS-block simulation, trustarc frame-origin probe.
+- Observation: gapcheck surveys with unfiltered DNS, so it also reports hosts
+  that only load inside frames the AdGuard DNS filter already blocks (the
+  trustarc hosts are an example). Real but low-value gaps.
+- **Still open:** task 6 (README.md, AGENTS.md, SURVEY_METHOD.md), push.
+
 ## Progress (2026-10-07, second Claude Code session on rimmer)
 
 Task 5 done apart from the pending decisions below; committed, not pushed.

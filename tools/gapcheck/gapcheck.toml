@@ -151,7 +151,7 @@ consent_labels = ["Okej"]
 "cdn.privacy-mgmt.com" = { kind = "cmp", note = "Sourcepoint platform behind the Guardian's CMP" }
 "inventory.schibsted.io" = { note = "Schibsted's own ad-serving subtree" }
 "scorecardresearch.com" = { note = "comScore; AdGuard DNS filter only has the typo sb.scorecard.research.com" }
-"www.googleadservices.com" = { note = "AdGuard DNS filter blocks googleadservices.com but has @@ for this exact host" }
+"www.googleadservices.com" = { kind = "infrastructure", note = "Not blocked by decision (2026-10-07): the AdGuard DNS filter's @@ for this host keeps Google sponsored-result clicks (/pagead/aclk) working" }
 "privacymanager.io" = { note = "Guardian header-bidding wrapper" }
 "bmtrcs.com" = { note = "Brandmetrics script host (not brandmetrics.com)" }
 "hasher.schibsted.com" = { note = "Schibsted identity hashing for ad targeting" }
@@ -162,6 +162,10 @@ consent_labels = ["Okej"]
 "essrtb.com" = { note = "SSP real-time bidding endpoint" }
 "adnxs-simple.com" = { note = "Xandr (AppNexus) ad-creative CDN" }
 "s0.2mdn.net" = { note = "DoubleClick ad-creative assets" }
+"imasdk.googleapis.com" = { note = "Google IMA SDK (video ads in players); see blocklist's video-ads section" }
+"c.2mdn.net" = { note = "DoubleClick video-ad media files" }
+"gcdn.2mdn.net" = { note = "DoubleClick video-ad media CDN" }
+"www.googletagmanager.com" = { kind = "infrastructure", note = "Not blocked by decision (2026-10-07): tag loader, not a tracker itself; blocking it breaks sites" }
 "www.googletagservices.com" = { note = "Google Publisher Tag loader (ads)" }
 "adsdkprod.azureedge.net" = { note = "Microsoft/Xandr ad SDK and safeframe" }
 "d1hhk3wj9kkagf.cloudfront.net" = { note = "Ad-creative layout scripts (takeover/widescreen) from the ad safeframe" }
@@ -186,6 +190,8 @@ consent_labels = ["Okej"]
 "ssp.wp.pl" = { note = "Wirtualna Polska SSP" }
 "pem-teads.tv" = { note = "Teads ad-tech (teads.tv itself is covered)" }
 "tapet.bnek.bn.nr" = { note = "Bonnier wallpaper/takeover ad tag (\"tapet\")" }
+"choices.trustarc.com" = { note = "TrustArc AdChoices icon/pixel in ad frames (not a CMP; consent.trustarc.com is one)" }
+"choices.truste.com" = { note = "TrustArc AdChoices icon/pixel in ad frames (not a CMP)" }
 "taptapnetworks.com" = { note = "Taptap Networks ad network; AdGuard only lists ads.taptapnetworks.com" }
 "youbora.com" = { note = "NPAW/Youbora video-viewing analytics" }
 "holid.io" = { note = "Holid header bidding (ads.holid.io, ip.holid.io are in AdGuard; others aren't)" }

@@ -172,6 +172,13 @@
 ! Taptap Networks ad network (sonata-notifications.); AdGuard only lists ads.taptapnetworks.com
 ||taptapnetworks.com^
 
+! Added 2026-10-07 (reviewed), seen on Guardian (article pages, inside ad frames)
+! TrustArc AdChoices icon (pmw2.js) and impression pixel (/cap) on Trade Desk display ads.
+! Host only: trustarc.com also runs a CMP (consent.trustarc.com) that other sites use.
+! Not the Guardian's consent flow; checked 2026-10-07 that Accept still works with both blocked.
+||choices.trustarc.com^
+||choices.truste.com^
+
 ! Already covered elsewhere, no action needed (kept here for the record):
 ! a.teads.tv                     -> covered via ||teads.tv^
 ! amazon-adsystem.com            -> covered (||amazon-adsystem.com^)
@@ -212,6 +219,44 @@
 ! Added 2026-10-07 (gapcheck, reviewed), seen on DN
 ! Holid header bidding (helloworld., null.); AdGuard only lists ads. and ip.
 ||holid.io^
+
+! =====================================================================
+! Video ads: Google IMA SDK and DoubleClick video media — all sites
+! Verified: 7 October 2026 (playback tested, see below)
+! =====================================================================
+
+! These hosts serve video ads (pre-rolls) in news sites' own players,
+! not ordinary page ads. They are kept separate on purpose: no
+! upstream list blocks them at DNS level, because a DNS rule can't make
+! per-site exceptions and some video players stall when the ad SDK is
+! missing. If a video player anywhere on the network breaks, comment
+! out the rules in this section first.
+!
+! EasyList blocks ||imasdk.googleapis.com^ but allows ima3.js again on
+! ~90 sites (Plex, Pluto TV, Crunchyroll, BBC, screen9 and more) where
+! players need it. It blocks ||2mdn.net^$~media, i.e. everything but
+! the video files; a DNS rule can't make that distinction, so these
+! rules also stop the ad video files themselves.
+!
+! Tested 2026-10-07 in headless Chromium, today's rules vs. today's
+! rules plus this section:
+! - DN (screen9 player, loads ima3.js): videos played identically.
+! - Aftonbladet TV (tv.aftonbladet.se): played identically; no IMA
+!   requests at all once the rest of this list is applied.
+! - YouTube (watch pages and embeds) never requests these hosts and
+!   played identically, its own pre-roll ad included; YouTube's ads
+!   come from youtube.com/googlevideo.com.
+! Not tested: smart-TV/streaming apps on the network (TV4 Play, Plex,
+! Pluto TV, ...), which may use the IMA SDK for their ads.
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Aftonbladet, DN
+! Google IMA SDK (ima3.js): loads and runs video ads in players
+||imasdk.googleapis.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Aftonbladet
+! DoubleClick video-ad media files (r*---sn-*.c.2mdn.net streams, gcdn. CDN)
+||c.2mdn.net^
+||gcdn.2mdn.net^
 
 ! =====================================================================
 ! [next site] — add here, same format: domain header, verified date,

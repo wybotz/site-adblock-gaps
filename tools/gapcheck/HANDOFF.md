@@ -2,6 +2,49 @@
 
 *Written 2026-10-07 at the end of a claude.ai session, for Claude Code to pick up on rimmer.*
 
+## Progress (2026-10-07, Claude Code session on Tobias's Mac)
+
+All of this is on the `gapcheck` branch, pushed to `origin`. `main` is
+untouched. Pick up at **task 2**; the Mac had no Podman, no systemd and only
+Python 3.9, so tasks 2–5 have to happen on rimmer.
+
+- **Task 1 done.** `tools/gapcheck/` is committed. `.gitignore` covers
+  `blocklist.new.txt`, `tools/gapcheck/out/` and `tools/gapcheck/.venv/`.
+- **`blocklist.txt` format checked.** Every rule is a bare `||host^` line
+  with notes on separate `!` lines. There are no inline comments to convert.
+- **Generator rewritten to keep site sections.** The old generator rebuilt
+  the file as Observed / Retained / Now covered. That would have deleted the
+  per-site sections, verification dates and reasons `AGENTS.md` requires.
+  `build_blocklist` now edits `blocklist.txt` in place:
+  - A new gap goes into the section of the first site (in `gapcheck.toml`
+    order) that loaded it. It sits after that section's rules and before its
+    "Already covered" notes, under `! NEW <date> (gapcheck), seen on …` and
+    a reason line. The reason is the host's `[hosts]` note, otherwise `TODO`.
+  - A site with no section (currently Aftonbladet and DN) gets a new one
+    before the `[next site]` template, with `Verified: TODO`. Sections are
+    matched on the domain in their header line against the site's `url` and
+    `first_party`.
+  - A rule now covered upstream is commented out where it stands.
+  - Everything else is left untouched.
+  - An unpaired `! ====` bar is an error (exit 1).
+  - The run summary and `report.md` count the `TODO` lines left.
+  - `README.md` describes this.
+- **Generator tested, browser survey not.** Testing used the real
+  `blocklist.txt` with synthetic verdicts and a stub enforced list:
+  placement, new sections, comment-out and the excepted annotation all
+  worked, and a second pass on the output produced no changes. The full
+  tool (Playwright) has still **never run**.
+- **`www.googleadservices.com` re-verified** against the raw AdGuard DNS
+  filter (v1.0.82.9, 2026-10-07). The filter has `||googleadservices.com^`
+  at line 10813 and `@@||www.googleadservices.com^|` at line 179092, so this
+  host is a real gap. The file gives no reason for the exception. The likely
+  reason is that www. also serves the click redirect for Google sponsored
+  results (`/pagead/aclk`), which DNS blocking would break. Tobias still has
+  to decide whether to add the rule; the first run will propose it with a
+  `TODO` reason.
+- **Still open:** tasks 2–6. Task 6 means `AGENTS.md` and
+  `SURVEY_METHOD.md`; only the gapcheck README was updated.
+
 ## Background
 
 Tobias runs **AdGuard Home** (DNS-level blocking) on the Proxmox VM `lister`

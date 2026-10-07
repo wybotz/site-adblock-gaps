@@ -45,6 +45,31 @@ Python 3.9, so tasks 2–5 have to happen on rimmer.
 - **Still open:** tasks 2–6. Task 6 means `AGENTS.md` and
   `SURVEY_METHOD.md`; only the gapcheck README was updated.
 
+## Progress (2026-10-07, second Claude Code session on rimmer)
+
+Task 5 done apart from the pending decisions below; committed, not pushed.
+
+- `blocklist.txt`: 37 rules (34 added, `ads.`/`cogwheel.inventory.schibsted.io`
+  widened to `||inventory.schibsted.io^`), each with date and reason; new
+  Aftonbladet and DN sections.
+- `gapcheck.toml`: infrastructure/CMP entries (incl. `static.privacy.schibsted.com`
+  as CMP: it serves the cmp.svd.se/cmp.aftonbladet.se dialog assets),
+  `guardianapps.co.uk` first-party, notes for every added host.
+- Unknowns resolved with a scratch probe (full URLs, referer, frame, body):
+  `prmutv.co` = Permutive identity sync (`/v2.0/pxid`); `cdn.ma.schibsted.digital`
+  = Pulse tracker proxy (tracking, not infra); `tq-tungsten.com` = ad-event
+  collector in Amazon ad frames; both cloudfront hosts = ad-creative assets.
+- Still Tobias's call: `www.googletagmanager.com`, `imasdk.googleapis.com`,
+  `www.googleadservices.com`, `choices.trustarc.com`/`truste.com`.
+- Second run proposed 24 more hosts (video/live-blog pages), now sorted:
+  mostly infrastructure (`vgc.no` widened, `schibsted.tech`, JW Player,
+  `cdn.sitestream.co` = SeenThis image/Storylines CDN, …),
+  `aftonbladet-cdn.se` first-party, `taptapnetworks.com` and `youbora.com`
+  blocked (39 rules). Also pending Tobias: `gcdn.2mdn.net` and
+  `*.c.2mdn.net` (video-ad media; EasyList exempts 2mdn.net media).
+- Reclassifying the last run's observations with the final config leaves
+  only the pending hosts above unresolved; no CMP host is matched.
+
 ## Progress (2026-10-07, Claude Code session on rimmer)
 
 Tasks 2–4 done; committed on `gapcheck`, not pushed. Pick up at **task 5**.

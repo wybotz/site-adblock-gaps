@@ -1,0 +1,126 @@
+# gapcheck configuration. Relative paths are relative to this file.
+
+[output]
+dir = "out"                                  # report.md + observations.json
+current_blocklist = "../../blocklist.txt"    # the reviewed, committed list
+new_blocklist = "../../blocklist.new.txt"    # written only when the rule set changes
+
+[dns]
+# If this machine's DNS goes through AdGuard Home with filtering on, blocked ad
+# scripts never load, so anything *they* would have fetched is never seen.
+# With require_unfiltered = true the run aborts (exit 2) instead of reporting
+# an incomplete picture.
+require_unfiltered = true
+probe_hosts = ["doubleclick.net", "amazon-adsystem.com"]
+
+[browser]
+headless = true
+channel = "chromium"          # full Chromium in new headless mode (behaves like a real browser)
+mask_headless_ua = true       # report "Chrome", not "HeadlessChrome", so ad tags don't skip us
+locale = "sv-SE"
+timezone = "Europe/Stockholm"
+viewport = { width = 1366, height = 900 }
+consent_timeout_s = 15        # how long to look for the cookie wall
+settle_s = 8                  # quiet time after loading/scrolling
+scroll_steps = 6              # scrolls to trigger lazy-loaded ad slots
+page_timeout_s = 45
+# Exact button labels (case-insensitive) that mean "accept all". Every frame is
+# searched, so labels inside third-party consent iframes work.
+consent_labels = ["Godkänn alla", "Acceptera alla", "Godkänn alla cookies", "Accept all", "Yes, I'm happy"]
+
+# --------------------------------------------------------------------------
+# Filter lists. enforced = true means AdGuard Home actually uses the list, so a
+# host it blocks is NOT a gap. Lists with enforced = false are only reported for
+# reference (e.g. what uBlock Origin would catch in a browser). If you subscribe
+# AdGuard Home to EasyPrivacy too, flip its entries to enforced = true.
+# syntax: "dns" applies AdGuard Home semantics (rules with $third-party, $script
+# etc. don't count), "browser" applies uBlock/AdGuard-extension semantics.
+# --------------------------------------------------------------------------
+[[filter_list]]
+name = "AdGuard DNS filter"
+url = "https://raw.githubusercontent.com/AdguardTeam/HostlistsRegistry/main/assets/filter_1.txt"
+enforced = true
+syntax = "dns"
+
+[[filter_list]]
+name = "EasyPrivacy (general)"
+url = "https://raw.githubusercontent.com/easylist/easylist/master/easyprivacy/easyprivacy_general.txt"
+enforced = false
+
+[[filter_list]]
+name = "EasyPrivacy (third-party)"
+url = "https://raw.githubusercontent.com/easylist/easylist/master/easyprivacy/easyprivacy_thirdparty.txt"
+enforced = false
+
+[[filter_list]]
+name = "EasyPrivacy (specific)"
+url = "https://raw.githubusercontent.com/easylist/easylist/master/easyprivacy/easyprivacy_specific.txt"
+enforced = false
+
+[[filter_list]]
+name = "EasyList (general block)"
+url = "https://raw.githubusercontent.com/easylist/easylist/master/easylist/easylist_general_block.txt"
+enforced = false
+
+# --------------------------------------------------------------------------
+# Sites to survey. Add as many as you like.
+#   url              page to open first (always logged out, fresh profile)
+#   article_pattern  optional regex; the first matching link on that page is
+#                    opened too (articles often carry more ad slots)
+#   first_party      domains treated as the site itself (the url's own domain
+#                    is always included). Not reported.
+#   cmp              consent-management hosts; never blocked (blocking them
+#                    hides the Accept button). The frame the Accept button was
+#                    found in is also excluded automatically.
+# --------------------------------------------------------------------------
+[[site]]
+name = "SvD"
+url = "https://www.svd.se/"
+article_pattern = '^https://www\.svd\.se/a/[A-Za-z0-9]+/'
+first_party = ["svd.se"]
+
+[[site]]
+name = "Guardian"
+url = "https://www.theguardian.com/uk-news"
+article_pattern = '^https://www\.theguardian\.com/[a-z-]+(/[a-z-]+)?/\d{4}/[a-z]{3}/\d{2}/[^#?]+$'
+first_party = ["theguardian.com", "guim.co.uk", "guardianapis.com"]
+cmp = ["cdn.privacy-mgmt.com"]
+
+[[site]]
+name = "Aftonbladet"
+url = "https://www.aftonbladet.se/"
+article_pattern = '^https://www\.aftonbladet\.se/[a-z]+/a/[A-Za-z0-9]+/'
+first_party = ["aftonbladet.se"]
+
+[[site]]
+name = "DN"
+url = "https://www.dn.se/"
+article_pattern = '^https://www\.dn\.se/(sverige|varlden|ekonomi|kultur|sport|sthlm|debatt)/[a-z0-9-]+/$'
+first_party = ["dn.se", "dn-static.se", "bonniernews.se"]
+
+# --------------------------------------------------------------------------
+# Known hosts (a key also matches its subdomains).
+#   kind = "infrastructure"  never a gap (CDNs, fonts, login, feature flags…)
+#   kind = "cmp"             consent platform; never blocked
+#   (no kind)                just attaches a note to the host in the output
+# Anything unknown and unblocked shows up as a NEW gap for you to judge; if it
+# turns out to be infrastructure, add it here and it stays out from then on.
+# --------------------------------------------------------------------------
+[hosts]
+"akamai.vgc.no" = { kind = "infrastructure", note = "Schibsted image CDN; blocking breaks article images" }
+"esm.schibsted.tech" = { kind = "infrastructure", note = "Schibsted ES-module CDN (React)" }
+"unleash-edge.schibsted.tech" = { kind = "infrastructure", note = "Schibsted feature flags (Unleash)" }
+"session-service.login.schibsted.com" = { kind = "infrastructure", note = "Schibsted login/session bootstrap" }
+"cdn.stream.schibsted.media" = { kind = "infrastructure", note = "Schibsted video platform" }
+"mediacdn.prenly.com" = { kind = "infrastructure", note = "Prenly e-paper cover images" }
+"time.akamai.com" = { kind = "infrastructure", note = "Akamai clock sync" }
+"fonts.googleapis.com" = { kind = "infrastructure", note = "Google Fonts" }
+"fonts.gstatic.com" = { kind = "infrastructure", note = "Google Fonts" }
+"cdn.privacy-mgmt.com" = { kind = "cmp", note = "Sourcepoint platform behind the Guardian's CMP" }
+"inventory.schibsted.io" = { note = "Schibsted's own ad-serving subtree" }
+"scorecardresearch.com" = { note = "comScore; AdGuard DNS filter only has the typo sb.scorecard.research.com" }
+"www.googleadservices.com" = { note = "AdGuard DNS filter blocks googleadservices.com but has @@ for this exact host" }
+"privacymanager.io" = { note = "Guardian header-bidding wrapper" }
+"bmtrcs.com" = { note = "Brandmetrics script host (not brandmetrics.com)" }
+"klarna.com" = { note = "Klarna; js.klarna.com also serves payment buttons, check DN subscribe flow" }
+"klarnacdn.net" = { note = "Klarna CDN; may also serve payment buttons" }

@@ -1,9 +1,10 @@
-! Supplementary ad/tracker blocklist — gaps not covered by EasyList,
-! EasyPrivacy, or the AdGuard DNS filter, found by surveying specific
-! sites' "Accept all" consent flow and watching real network traffic.
+! Supplementary ad/tracker blocklist — gaps not covered by the AdGuard
+! DNS filter (the list AdGuard Home enforces), found by surveying
+! specific sites' "Accept all" consent flow and watching real network
+! traffic. Meant to be used alongside that filter, not instead of it.
 !
 ! Maintained by: Tobias
-! Source repo: (fill in once pushed)
+! Source repo: https://github.com/wybotz/site-adblock-gaps
 !
 ! Syntax: standard Adblock Plus / uBlock Origin / AdGuard domain-blocking
 ! syntax (||domain^). AdGuard Home accepts this file directly as a

@@ -106,7 +106,9 @@ consent_labels = ["Okej"]
 
 # --------------------------------------------------------------------------
 # Known hosts (a key also matches its subdomains).
-#   kind = "infrastructure"  never a gap (CDNs, fonts, login, feature flags…)
+#   kind = "infrastructure"  never a gap (CDNs, fonts, login, feature flags…);
+#                            also ad-tech deliberately left unblocked, with a
+#                            note starting "Not blocked by decision (date)"
 #   kind = "cmp"             consent platform; never blocked
 #   (no kind)                just attaches a note to the host in the output
 # Anything unknown and unblocked shows up as a NEW gap for you to judge; if it

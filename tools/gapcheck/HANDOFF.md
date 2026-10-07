@@ -67,7 +67,15 @@ Task 5 finished; all pending decisions made. Committed, not pushed.
 - Observation: gapcheck surveys with unfiltered DNS, so it also reports hosts
   that only load inside frames the AdGuard DNS filter already blocks (the
   trustarc hosts are an example). Real but low-value gaps.
-- **Still open:** task 6 (README.md, AGENTS.md, SURVEY_METHOD.md), push.
+- **Task 6 done** (second commit of this session): README.md, AGENTS.md,
+  SURVEY_METHOD.md describe gapcheck, the review workflow, "Judging a host"
+  and breakage testing. Coverage criterion corrected everywhere (also in the
+  blocklist header): the AdGuard DNS filter only; EasyList/EasyPrivacy are
+  reference. Blocklist header now has the repo URL.
+- **Still open:** Tobias reviews and pushes; merge to `main`; subscribe
+  AdGuard Home to the raw URL. Manual survey of DN's subscribe flow for the
+  Klarna hosts and `tapet-paywall.bnek.bn.nr` (gapcheck never visits it).
+  SvD/Guardian section headers still say "Verified: 2 September 2026".
 
 ## Progress (2026-10-07, second Claude Code session on rimmer)
 

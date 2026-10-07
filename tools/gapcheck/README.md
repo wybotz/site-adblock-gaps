@@ -103,9 +103,12 @@ git diff --no-index blocklist.txt blocklist.new.txt
 mv blocklist.new.txt blocklist.txt && git commit -am "gapcheck: update" && git push
 ```
 
-Before committing, judge every `NEW` rule. If a new host is really a CDN or
+Before committing, judge every `NEW` rule; `../../SURVEY_METHOD.md`,
+"Judging a host", has the decision rules. If a new host is really a CDN or
 another piece of infrastructure, add it to `[hosts]` in `gapcheck.toml` with
-`kind = "infrastructure"` and delete the rule. It won't come back.
+`kind = "infrastructure"` and delete the rule. It won't come back. The same
+goes for ad-tech you decide not to block: `kind = "infrastructure"`, with a
+note starting "Not blocked by decision (date)" that says why.
 
 Replace every `TODO` line with a real one-line reason or verified date, as
 `AGENTS.md` requires. The run summary and `report.md` count the `TODO`

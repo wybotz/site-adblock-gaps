@@ -2,6 +2,69 @@
 
 *Written 2026-10-07 at the end of a claude.ai session, for Claude Code to pick up on rimmer.*
 
+## Start here (state at end of 2026-10-07)
+
+Everything below this section is a dated log; the entries aren't in
+chronological order. This section is the current truth.
+
+**State**
+
+- Branch `gapcheck`, 5 commits ahead of `origin/gapcheck`, **not pushed**:
+  `2a46b69` Podman/Quadlet, `2f0b66b` first judged runs, `2c8a54e` pending
+  hosts decided, `d4dbc91` docs, then this handoff update. `main` is
+  untouched. Working tree clean.
+- Tasks 1–6 are done. gapcheck runs unattended (timer: Mondays 21:00
+  Stockholm; next run Mon 2026-10-12). Every host seen so far is decided.
+  `blocklist.txt` has 44 rules. That run is the first with all decisions
+  in place, so it should propose little or nothing; check its result.
+- `blocklist.new.txt` in the repo root is a stale candidate from the first
+  runs (12:12 on 2026-10-07). Ignore it; the next run overwrites it.
+- Docs (README.md, AGENTS.md, SURVEY_METHOD.md) describe gapcheck, the
+  review workflow, "Judging a host" and "Breakage testing". Coverage
+  criterion everywhere: the AdGuard DNS filter only; EasyList/EasyPrivacy
+  are reference.
+
+**Next steps, in order**
+
+1. Tobias reviews the 5 commits (`git log -p origin/gapcheck..gapcheck`)
+   and pushes. Don't push without his go-ahead.
+2. Merge `gapcheck` into `main` (his call: PR or local merge).
+3. Subscribe AdGuard Home on lister to
+   `https://raw.githubusercontent.com/wybotz/site-adblock-gaps/main/blocklist.txt`,
+   then remove the hand-pasted duplicates from its custom rules. For the
+   first week, watch TV/streaming apps (TV4 Play, Plex): the video-ad
+   section (imasdk, 2mdn) was only tested on DN, Aftonbladet TV and YouTube.
+4. Manual survey of DN's subscribe/paywall flow (look only: no login, no
+   payment). gapcheck never visits it, so these hosts from the 5 Oct manual
+   survey are still undecided and not in the list: `eu.klarnaevt.com`
+   (looks like plain tracking), `osm.klarnaservices.com`, `js.klarna.com`,
+   `x.klarnacdn.net` (may be needed for payment buttons),
+   `tapet-paywall.bnek.bn.nr` (may be functional).
+5. Smaller items:
+   - The SvD and Guardian section headers still say "Verified:
+     2 September 2026".
+   - Optionally commit the playback test as `tools/gapcheck/playtest.py`
+     (offered; Tobias hasn't answered).
+   - Optional gapcheck feature: flag gaps that only load inside frames the
+     AdGuard DNS filter already blocks (low value, e.g. the trustarc hosts).
+
+**Practical notes**
+
+- rimmer has **no git identity configured**. Commits so far use
+  `git -c user.name=wybotz -c user.email=wybotz@users.noreply.github.com
+  commit …`, matching all earlier commits. Tobias may set it globally
+  himself.
+- Probe scripts from 2026-10-07 are kept in `tools/gapcheck/out/probes/`
+  (git-ignored): `playtest.py` (video playback, baseline vs. extra rules),
+  `yt.py` (YouTube), `trustarc.py` (frame origin of requests),
+  `discover.py`. They import gapcheck and expect the repo mounted at
+  `/work`. `playtest.py` reads the raw AdGuard DNS filter as
+  `adguard_dns.txt` from its working directory, so download it there
+  first. Run example:
+  `podman run --rm --dns 9.9.9.10 --shm-size 1g -v $PWD/out/probes:/probe:Z -v ~/dev/site-adblock-gaps:/work:ro,Z -w /probe localhost/gapcheck python3 playtest.py baseline <URL>`
+- Writing `.py` checks inside `tools/gapcheck/` creates `__pycache__/`;
+  run Python with `-B` or delete it afterwards (it isn't git-ignored).
+
 ## Progress (2026-10-07, Claude Code session on Tobias's Mac)
 
 All of this is on the `gapcheck` branch, pushed to `origin`. `main` is

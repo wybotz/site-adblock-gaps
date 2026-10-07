@@ -65,13 +65,16 @@ enforced = false
 # --------------------------------------------------------------------------
 # Sites to survey. Add as many as you like.
 #   url              page to open first (always logged out, fresh profile)
-#   article_pattern  optional regex; the first matching link on that page is
-#                    opened too (articles often carry more ad slots)
+#   article_pattern  optional regex; the first matching link outside the page's
+#                    header/nav/footer is opened too (articles often carry
+#                    more ad slots)
 #   first_party      domains treated as the site itself (the url's own domain
 #                    is always included). Not reported.
 #   cmp              consent-management hosts; never blocked (blocking them
 #                    hides the Accept button). The frame the Accept button was
 #                    found in is also excluded automatically.
+#   consent_labels   optional extra "accept all" labels for this site only,
+#                    for labels too generic to search for everywhere
 # --------------------------------------------------------------------------
 [[site]]
 name = "SvD"
@@ -97,6 +100,9 @@ name = "DN"
 url = "https://www.dn.se/"
 article_pattern = '^https://www\.dn\.se/(sverige|varlden|ekonomi|kultur|sport|sthlm|debatt)/[a-z0-9-]+/$'
 first_party = ["dn.se", "dn-static.se", "bonniernews.se"]
+# Bonnier's own CMP in the top-level page; "Okej" is its accept-all button
+# (verified 2026-10-07). Next to it is "Inställningar".
+consent_labels = ["Okej"]
 
 # --------------------------------------------------------------------------
 # Known hosts (a key also matches its subdomains).

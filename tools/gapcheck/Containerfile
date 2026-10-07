@@ -1,0 +1,5 @@
+# The Playwright image ships the browsers but not the Python package.
+# Keep the tag in step with requirements.txt.
+FROM mcr.microsoft.com/playwright/python:v1.63.0-noble
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt

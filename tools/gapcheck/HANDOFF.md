@@ -45,6 +45,35 @@ Python 3.9, so tasks 2–5 have to happen on rimmer.
 - **Still open:** tasks 2–6. Task 6 means `AGENTS.md` and
   `SURVEY_METHOD.md`; only the gapcheck README was updated.
 
+## Progress (2026-10-07, Claude Code session on rimmer)
+
+Tasks 2–4 done; committed on `gapcheck`, not pushed. Pick up at **task 5**.
+
+- **Podman 5.7.0** installed, linger enabled. Units are in
+  `tools/gapcheck/quadlet/`: `gapcheck.build` (image from `Containerfile`:
+  `mcr.microsoft.com/playwright/python:v1.63.0-noble` plus
+  `playwright==1.63.0`; the stock image has the browsers but no Python
+  package), `gapcheck.container`, and `gapcheck.timer`. The timer lives in
+  `~/.config/systemd/user/`, since Quadlet ignores `.timer` files, and fires
+  Mondays 21:00 Europe/Stockholm (rimmer's clock is UTC). `run.sh` removed;
+  README rewritten for Podman.
+- **DNS:** `9.9.9.10` works from the container; the UCG doesn't hijack
+  port 53. The guard passes.
+- **Fixes from the first real runs:**
+  - Wildcard rules (`||prebid-*.rubiconproject.com^`, 403 in the AdGuard DNS
+    filter) were silently dropped, making covered hosts look like gaps. Now
+    parsed with AdGuard semantics.
+  - `chrome-extension://` requests were recorded as hosts; only http(s)/ws(s)
+    count now.
+  - Log lines appeared twice in the journal (`LogDriver=passthrough`).
+  - Article links are picked outside header/nav/footer; SvD had picked its
+    "Tipsa SvD" page and Aftonbladet its "Direkt" nav link.
+- **DN's accept button is "Okej"** (Bonnier CMP in the top-level page). Added
+  as a per-site `consent_labels` option so the generic word isn't searched
+  on other sites.
+- All four sites consent and reach an article. The run gives 71 gaps; task 5
+  is judging them.
+
 ## Background
 
 Tobias runs **AdGuard Home** (DNS-level blocking) on the Proxmox VM `lister`

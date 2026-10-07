@@ -1,0 +1,28 @@
+# Quadlet unit: one-shot gapcheck run in a rootless Podman container.
+# Install: cp quadlet/gapcheck.{build,container} ~/.config/containers/systemd/
+#          cp quadlet/gapcheck.timer ~/.config/systemd/user/
+#          systemctl --user daemon-reload
+# The image is built by gapcheck.build (see ../Containerfile).
+[Unit]
+Description=gapcheck ad-tracker survey
+
+[Container]
+Image=gapcheck.build
+Volume=%h/dev/site-adblock-gaps:/work
+WorkingDir=/work/tools/gapcheck
+Exec=python3 gapcheck.py
+# Unfiltered resolver, so the host can stay behind AdGuard Home.
+DNS=9.9.9.10
+# Chromium crashes with the default 64 MB /dev/shm.
+ShmSize=1g
+RunInit=true
+Environment=PYTHONUNBUFFERED=1
+# Output reaches the journal once, via the unit, not again via conmon.
+LogDriver=passthrough
+
+[Service]
+Type=oneshot
+# 3 = new candidate blocklist.new.txt written; not a failure.
+SuccessExitStatus=3
+# Allows for the first image pull and build.
+TimeoutStartSec=30min

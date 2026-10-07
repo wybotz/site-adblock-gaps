@@ -41,55 +41,58 @@ Outputs:
 
 - `out/report.md`: every third-party host with its verdict.
 - `out/observations.json`: raw data.
-- `out/gapcheck.log`: the cron log.
+- The run summary goes to the journal (`journalctl --user -u gapcheck`).
 
 ## Install on rimmer (Ubuntu 26.04)
 
-The script lives in the repo at `tools/gapcheck/`, so clone the repo on rimmer:
+gapcheck runs as a one-shot rootless Podman container, started weekly by a
+systemd user timer. The image is the official Playwright image, which bundles
+Chromium and its libraries, plus the pinned `playwright` package from
+`requirements.txt` (see `Containerfile`). Keep the image tag and the
+`requirements.txt` pin in step.
 
 ```bash
+sudo apt install podman
+loginctl enable-linger            # run user units without being logged in
 git clone git@github.com:wybotz/site-adblock-gaps.git ~/dev/site-adblock-gaps
-cd ~/dev/site-adblock-gaps/tools/gapcheck
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/playwright install chromium
-chmod +x run.sh
+cd ~/dev/site-adblock-gaps/tools/gapcheck/quadlet
+mkdir -p ~/.config/containers/systemd ~/.config/systemd/user
+cp gapcheck.build gapcheck.container ~/.config/containers/systemd/  # Quadlet
+cp gapcheck.timer ~/.config/systemd/user/                         # plain systemd
+systemctl --user daemon-reload
+systemctl --user enable --now gapcheck.timer
 ```
 
-Skip `--with-deps` on the last step. It only knows the apt package names for
-supported LTS releases, and rimmer already has a full GNOME desktop, so
-Chromium's libraries are in place. If Chromium fails to start, list what's
-missing and install those packages with apt:
+The units in `quadlet/`:
 
-```bash
-ldd ~/.cache/ms-playwright/chromium-*/chrome-linux*/chrome | grep 'not found'
-```
+- `gapcheck.build` builds `localhost/gapcheck` from `Containerfile`. It runs
+  before every survey, and the layer cache makes it near-instant.
+- `gapcheck.container` mounts the repo at `/work` and runs
+  `python3 gapcheck.py` in `tools/gapcheck`. Exit code 3 (new candidate list)
+  counts as success.
+- `gapcheck.timer` runs the survey on Mondays at 21:00 Swedish time. `Persistent=true`
+  catches up on a run missed while rimmer was off.
 
-## Exempt rimmer from AdGuard Home filtering
+After editing a unit in the repo, copy it again and run
+`systemctl --user daemon-reload`.
 
-This step is required. If rimmer's DNS goes through AdGuard Home with
-filtering on, the blocked ad scripts never load. Everything *they* would have
-fetched is then invisible, which hides exactly the hosts you're looking for.
-The script checks this first and stops with exit code 2.
+## DNS: the container uses its own resolver
 
-In AdGuard Home, add rimmer's IP as a persistent client
-(*Settings → Client settings*) and turn filtering off for that client only. The
-trade-off is that rimmer's own browsing goes unfiltered.
+The container resolves through `9.9.9.10` (Quad9, unfiltered), so rimmer
+itself can stay behind AdGuard Home. Filtered DNS would hide the very hosts
+this tool looks for: blocked ad scripts never load, so nothing *they* fetch is
+seen. The script checks this first and stops with exit code 2 if
+`doubleclick.net` or `amazon-adsystem.com` is sinkholed or doesn't resolve.
+If that happens, the router is probably redirecting port 53 to AdGuard Home,
+and rimmer needs a DNS exception on the UCG.
 
 ## Run
 
 ```bash
-./run.sh                                  # what cron runs
-.venv/bin/python gapcheck.py --help
+systemctl --user start gapcheck          # one survey now (takes ~4 minutes)
+journalctl --user -u gapcheck -e         # its output
+systemctl --user list-timers gapcheck    # next scheduled run
 ```
-
-Cron (`crontab -e` as tobias), Mondays at 21:00:
-
-```
-0 21 * * 1  $HOME/dev/site-adblock-gaps/tools/gapcheck/run.sh
-```
-
-`run.sh` prints output only on changes or errors.
 
 ## Review a new candidate list
 

@@ -106,6 +106,12 @@ class Rule:
     exact: bool = False  # hosts-file entries match only that exact host
 
 
+def wildcard_rx(pattern: str) -> re.Pattern:
+    """Host matcher for a ||pattern^ with '*' (any run of characters, dots too)."""
+    body = ".*".join(re.escape(part) for part in pattern.split("*"))
+    return re.compile(r"(?:^|\.)" + body + "$")
+
+
 @dataclass
 class FilterList:
     name: str
@@ -116,6 +122,10 @@ class FilterList:
     blocks: dict[str, Rule] = field(default_factory=dict)
     exceptions: dict[str, Rule] = field(default_factory=dict)
     partials: dict[str, str] = field(default_factory=dict)
+    # '*' patterns: pattern -> (matcher, rule or partial line)
+    wild_blocks: dict[str, tuple[re.Pattern, Rule]] = field(default_factory=dict)
+    wild_exceptions: dict[str, tuple[re.Pattern, Rule]] = field(default_factory=dict)
+    wild_partials: dict[str, tuple[re.Pattern, str]] = field(default_factory=dict)
 
     def parse(self, text: str) -> None:
         full_opts = DNS_FULL_OPTS if self.syntax == "dns" else BROWSER_FULL_OPTS
@@ -140,11 +150,12 @@ class FilterList:
                 continue  # regex, |http…, plain paths: not domain rules
             pattern, _, optstr = body[2:].partition("$")
             opts = {o.strip().lower() for o in optstr.split(",") if o.strip()} if optstr else set()
-            m = re.match(r"([a-z0-9.\-_]+)(.*)$", pattern, re.I)
+            m = re.match(r"([a-z0-9.\-_*]+)(.*)$", pattern, re.I)
             if not m:
                 continue
             domain, rest = m.group(1).lower().strip("."), m.group(2)
-            if "." not in domain:
+            wild = "*" in domain
+            if "." not in domain or (wild and not domain.strip("*.")):
                 continue
             if "badfilter" in opts:
                 badfiltered.add(domain)
@@ -153,25 +164,39 @@ class FilterList:
             narrowing = opts - full_opts
             if not whole_domain or narrowing:
                 if not exception:
-                    self.partials.setdefault(domain, line)
+                    if wild:
+                        self.wild_partials.setdefault(domain, (wildcard_rx(domain), line))
+                    else:
+                        self.partials.setdefault(domain, line)
                 continue
             rule = Rule(line, important="important" in opts)
-            target = self.exceptions if exception else self.blocks
-            target.setdefault(domain, rule)
+            if wild:
+                target = self.wild_exceptions if exception else self.wild_blocks
+                target.setdefault(domain, (wildcard_rx(domain), rule))
+            else:
+                target = self.exceptions if exception else self.blocks
+                target.setdefault(domain, rule)
         for d in badfiltered:
             self.blocks.pop(d, None)
+            self.wild_blocks.pop(d, None)
 
     def check(self, host: str) -> tuple[str, str | None]:
         """Return (status, rule) with status in blocked/excepted/partial/none."""
         cands = parents(host)
         block = next(((d, self.blocks[d]) for d in cands
                       if d in self.blocks and (not self.blocks[d].exact or d == host)), None)
+        block = block or next(((d, r) for d, (rx, r) in self.wild_blocks.items()
+                               if rx.search(host)), None)
         exc = next(((d, self.exceptions[d]) for d in cands if d in self.exceptions), None)
+        exc = exc or next(((d, r) for d, (rx, r) in self.wild_exceptions.items()
+                           if rx.search(host)), None)
         if block and exc and not (block[1].important and not exc[1].important):
             return "excepted", f"{block[1].text}  but  {exc[1].text}"
         if block:
             return "blocked", block[1].text
         partial = next((self.partials[d] for d in cands if d in self.partials), None)
+        partial = partial or next((t for rx, t in self.wild_partials.values()
+                                   if rx.search(host)), None)
         if partial:
             return "partial", partial
         return "none", None
@@ -190,7 +215,7 @@ def load_lists(cfg: dict) -> list[FilterList]:
         with urllib.request.urlopen(req, timeout=120) as resp:
             fl.parse(resp.read().decode("utf-8", errors="replace"))
         log(f"  {fl.lines} lines, {len(fl.blocks)} domain blocks, "
-            f"{len(fl.exceptions)} exceptions")
+            f"{len(fl.wild_blocks)} wildcard blocks, {len(fl.exceptions)} exceptions")
         lists.append(fl)
     enforced = [fl for fl in lists if fl.enforced]
     if not enforced:
@@ -233,6 +258,11 @@ class SiteResult:
     errors: list[str] = field(default_factory=list)
 
 
+NON_CHROME_LINKS_JS = """els => els
+    .filter(e => !e.closest('header, nav, footer, [role=banner], [role=navigation], [role=contentinfo]'))
+    .map(e => e.href)"""
+
+
 def click_consent(page, labels, timeout_s: float):
     rx = re.compile(r"^\s*(?:" + "|".join(re.escape(l) for l in labels) + r")\s*$", re.I)
     deadline = dt.datetime.now() + dt.timedelta(seconds=timeout_s)
@@ -273,19 +303,21 @@ def survey_site(browser, site: dict, bcfg: dict) -> SiteResult:
     ctx = browser.new_context(**ctx_args)  # fresh profile: no prior consent cookies
 
     def on_request(req):
+        # Only network traffic; skips data:, blob: and chrome-extension: URLs.
         h = host_of(req.url)
-        if h and not req.url.startswith(("data:", "blob:")):
+        if h and req.url.startswith(("http:", "https:", "ws:", "wss:")):
             res.requests += 1
             res.hosts.setdefault(h, set()).add(req.resource_type)
 
     ctx.on("request", on_request)
+    labels = bcfg["consent_labels"] + site.get("consent_labels", [])
     page = ctx.new_page()
     page.set_default_timeout(bcfg.get("page_timeout_s", 45) * 1000)
     try:
         page.goto(site["url"], wait_until="domcontentloaded")
         res.visited.append(page.url)
         res.consent, res.consent_host = click_consent(
-            page, bcfg["consent_labels"], bcfg.get("consent_timeout_s", 15))
+            page, labels, bcfg.get("consent_timeout_s", 15))
         if not res.consent:
             res.errors.append("no consent button found (already consented? new label?)")
         settle(page, bcfg)
@@ -293,14 +325,15 @@ def survey_site(browser, site: dict, bcfg: dict) -> SiteResult:
         pattern = site.get("article_pattern")
         if pattern:
             rx = re.compile(pattern)
-            links = page.eval_on_selector_all("a[href]", "els => els.map(e => e.href)")
+            # Skip site chrome so "tip us"/"about" links don't win over stories.
+            links = page.eval_on_selector_all("a[href]", NON_CHROME_LINKS_JS)
             article = next((u for u in links if rx.search(u)), None)
             if article:
                 page.goto(article, wait_until="domcontentloaded")
                 res.visited.append(page.url)
                 if not res.consent:  # some sites only show the wall on articles
                     res.consent, res.consent_host = click_consent(
-                        page, bcfg["consent_labels"], bcfg.get("consent_timeout_s", 15))
+                        page, labels, bcfg.get("consent_timeout_s", 15))
                     if res.consent:
                         res.errors.pop()
                 settle(page, bcfg)

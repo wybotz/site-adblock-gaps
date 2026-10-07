@@ -1,0 +1,9 @@
+[Unit]
+Description=Weekly gapcheck survey
+
+[Timer]
+OnCalendar=Mon *-*-* 21:00:00 Europe/Stockholm
+Persistent=true
+
+[Install]
+WantedBy=timers.target

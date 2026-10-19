@@ -1,9 +1,10 @@
-! Supplementary ad/tracker blocklist — gaps not covered by EasyList,
-! EasyPrivacy, or the AdGuard DNS filter, found by surveying specific
-! sites' "Accept all" consent flow and watching real network traffic.
+! Supplementary ad/tracker blocklist — gaps not covered by the AdGuard
+! DNS filter (the list AdGuard Home enforces), found by surveying
+! specific sites' "Accept all" consent flow and watching real network
+! traffic. Meant to be used alongside that filter, not instead of it.
 !
 ! Maintained by: Tobias
-! Source repo: (fill in once pushed)
+! Source repo: https://github.com/wybotz/site-adblock-gaps
 !
 ! Syntax: standard Adblock Plus / uBlock Origin / AdGuard domain-blocking
 ! syntax (||domain^). AdGuard Home accepts this file directly as a
@@ -22,9 +23,67 @@
 ! lists DO cover several OTHER Schibsted tracking domains (e.g.
 ! collector.schibsted.io, dc.schibsted.io, sdk.pulse.schibsted.io,
 ! cis.schibsted.com) — this isn't a blind spot about Schibsted
-! generally, just these two specific ad-serving hosts.
-||ads.inventory.schibsted.io^
-||cogwheel.inventory.schibsted.io^
+! generally, just its ad-serving subtree.
+! Widened 2026-10-07 from ads. and cogwheel. to the whole subtree: gapcheck
+! also saw alertory-cdn., inv-platform-cdn., log.kcontent.,
+! logreq.kcontent. and streams.kcontent. on SvD and Aftonbladet.
+||inventory.schibsted.io^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD, Aftonbladet
+! Schibsted identity hashing for ad targeting
+||hasher.schibsted.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD, Aftonbladet
+! Schibsted ad-targeting identity service
+||ncis.schibsted.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD
+! Schibsted ad-creative hosting
+||admarket-creatives.spt-ads-rose-pro.schibsted.io^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD
+! Schibsted Pulse tracker proxy and helper scripts (pulse-tracker-proxy.js)
+||cdn.ma.schibsted.digital^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD, Aftonbladet
+! Brandmetrics script/beacon host (brandmetrics.com is covered, bmtrcs.com isn't)
+||bmtrcs.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD, Aftonbladet
+! Nodals ad-tech: scripts (static.), pixels (t.) and beacons
+||nodals.io^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD, Aftonbladet
+! SSP real-time bidding endpoint (bid.essrtb.com)
+||essrtb.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD, Aftonbladet
+! Xandr (AppNexus) ad-creative CDN; AdGuard only lists ib.adnxs-simple.com
+||adnxs-simple.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD, Aftonbladet, DN
+! DoubleClick ad-creative assets. Host only: EasyList exempts 2mdn.net media (video ads in players)
+||s0.2mdn.net^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD, Aftonbladet
+! Google Publisher Tag loader (ads); EasyList blocks it, the AdGuard DNS filter doesn't
+||www.googletagservices.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD, Aftonbladet
+! Microsoft/Xandr ad SDK and ad safeframe
+||adsdkprod.azureedge.net^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD, Aftonbladet
+! Ad-creative layout scripts (adt_fss_fix.js, widescreen_fix.js) loaded from the ad safeframe
+||d1hhk3wj9kkagf.cloudfront.net^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD
+! Ad-creative video (SvD panorama ad mp4) played in an adnxs-simple creative frame
+||d1l8uaby7rve2g.cloudfront.net^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on SvD, Aftonbladet
+! Iterate surveys/feedback tracking; AdGuard only lists platform.iteratehq.com
+||iteratehq.com^
 
 ! Already covered elsewhere, no action needed (kept here for the record):
 ! adsdk.microsoft.com            -> covered (||adsdk.microsoft.com^)
@@ -45,6 +104,91 @@
 ! doesn't match it, most likely a long-standing typo upstream.
 ||scorecardresearch.com^
 
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! Permutive identity sync (/v2.0/pxid returns a user id); permutive.app/.com are covered, prmutv.co isn't
+||prmutv.co^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian, DN
+! Ad-tech cookie/ID sync (cs.loudecho.ai)
+||loudecho.ai^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! Amazon telemetry beacon
+||unagi-eu.amazon.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! Connatix video-ad tracking; AdGuard lists other connatix.com hosts, not capi.
+||capi.connatix.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! Ad-tech tracking pixel (go.mediagotechnology.com)
+||mediagotechnology.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! myGaru identity resolution for ads (ident.mygaru.com, cdn.mgaru.dev)
+||mygaru.com^
+||mgaru.dev^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian, DN
+! Opera Ads tracking/sync; AdGuard only lists res.oa.opera.com
+||t.oa.opera.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian, DN
+! Magnite (Rubicon) SSP (token., secure-assets.); EasyList blocks the whole domain, AdGuard only some hosts
+||rubiconproject.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! Yahoo Prebid Server
+||pbs.yahoo.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! Ad-event collector (/collect/3pEvent) called from Amazon ad frames
+||www.btd-zaz.tq-tungsten.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian, DN
+! Ad-tech cookie sync
+||sync.adtech.ink^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! Ad-tech cookie sync
+||sync.pmbmonetize.live^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! AppsFlyer OneLink ad-impression tracking (host only; onelink.me also does app links)
+||impressions.onelink.me^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! Lotame DMP tag; the AdGuard DNS filter blocks crwdcntrl.net but has @@||tags.crwdcntrl.net^|
+||tags.crwdcntrl.net^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian, DN
+! Wirtualna Polska SSP
+||ssp.wp.pl^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! Teads ad-tech (teads.tv is covered, pem-teads.tv isn't)
+||pem-teads.tv^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Guardian
+! Taptap Networks ad network (sonata-notifications.); AdGuard only lists ads.taptapnetworks.com
+||taptapnetworks.com^
+
+! Added 2026-10-07 (reviewed), seen on Guardian (article pages, inside ad frames)
+! TrustArc AdChoices icon (pmw2.js) and impression pixel (/cap) on Trade Desk display ads.
+! Host only: trustarc.com also runs a CMP (consent.trustarc.com) that other sites use.
+! Not the Guardian's consent flow; checked 2026-10-07 that Accept still works with both blocked.
+||choices.trustarc.com^
+||choices.truste.com^
+
+! Added 2026-10-19 (gapcheck, reviewed), seen on Guardian
+! Microsoft/Bing cookie-sync pixel (/c.gif?Red3=CTOMS_pd) sent with the TCF consent string.
+! Host only: bing.com is search.
+||c.bing.com^
+
+! Added 2026-10-19 (gapcheck, reviewed), seen on Guardian (inside Google ad safeframes)
+! Prebid universal creative (creative.js) used to render header-bidding ads. Host only.
+||www.unpkg.com^
+
 ! Already covered elsewhere, no action needed (kept here for the record):
 ! a.teads.tv                     -> covered via ||teads.tv^
 ! amazon-adsystem.com            -> covered (||amazon-adsystem.com^)
@@ -55,6 +199,78 @@
 !   (note: a few specific doubleclick.net subdomains, e.g. pagead.l. and
 !   www3., have explicit @@ allow-exceptions in these lists — not the
 !   one used here, but worth knowing these lists do carve out exceptions)
+
+! =====================================================================
+! Aftonbladet (Schibsted) — aftonbladet.se
+! Verified: 7 October 2026 (gapcheck run, reviewed by hand)
+! =====================================================================
+
+! Shares Schibsted's ad stack with SvD; those rules live in the SvD
+! section (inventory.schibsted.io, hasher./ncis.schibsted.com, nodals.io,
+! adnxs-simple.com, ...).
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Aftonbladet
+! Norstat survey/panel measurement
+||sch-map.norstatsurveys.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Aftonbladet
+! NPAW/Youbora video-viewing analytics plugin (smartplugin.)
+||youbora.com^
+
+! =====================================================================
+! DN (Bonnier) — dn.se
+! Verified: 7 October 2026 (gapcheck run, reviewed by hand)
+! =====================================================================
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on DN
+! Bonnier wallpaper/takeover ad tag ("tapet"). Host only: tapet-paywall. may be functional
+||tapet.bnek.bn.nr^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on DN
+! Holid header bidding (helloworld., null.); AdGuard only lists ads. and ip.
+||holid.io^
+
+! Added 2026-10-19 (gapcheck, reviewed), seen on DN (inside an ih.adscale.de ad frame)
+! Ströer cookie-match pixel (/stroer/cm) sent with the TCF consent string.
+||green.erne.co^
+
+! =====================================================================
+! Video ads: Google IMA SDK and DoubleClick video media — all sites
+! Verified: 7 October 2026 (playback tested, see below)
+! =====================================================================
+
+! These hosts serve video ads (pre-rolls) in news sites' own players,
+! not ordinary page ads. They are kept separate on purpose: no
+! upstream list blocks them at DNS level, because a DNS rule can't make
+! per-site exceptions and some video players stall when the ad SDK is
+! missing. If a video player anywhere on the network breaks, comment
+! out the rules in this section first.
+!
+! EasyList blocks ||imasdk.googleapis.com^ but allows ima3.js again on
+! ~90 sites (Plex, Pluto TV, Crunchyroll, BBC, screen9 and more) where
+! players need it. It blocks ||2mdn.net^$~media, i.e. everything but
+! the video files; a DNS rule can't make that distinction, so these
+! rules also stop the ad video files themselves.
+!
+! Tested 2026-10-07 in headless Chromium, today's rules vs. today's
+! rules plus this section:
+! - DN (screen9 player, loads ima3.js): videos played identically.
+! - Aftonbladet TV (tv.aftonbladet.se): played identically; no IMA
+!   requests at all once the rest of this list is applied.
+! - YouTube (watch pages and embeds) never requests these hosts and
+!   played identically, its own pre-roll ad included; YouTube's ads
+!   come from youtube.com/googlevideo.com.
+! Not tested: smart-TV/streaming apps on the network (TV4 Play, Plex,
+! Pluto TV, ...), which may use the IMA SDK for their ads.
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Aftonbladet, DN
+! Google IMA SDK (ima3.js): loads and runs video ads in players
+||imasdk.googleapis.com^
+
+! Added 2026-10-07 (gapcheck, reviewed), seen on Aftonbladet
+! DoubleClick video-ad media files (r*---sn-*.c.2mdn.net streams, gcdn. CDN)
+||c.2mdn.net^
+||gcdn.2mdn.net^
 
 ! =====================================================================
 ! [next site] — add here, same format: domain header, verified date,

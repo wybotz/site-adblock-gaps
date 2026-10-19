@@ -1,0 +1,5 @@
+# Builds localhost/gapcheck from tools/gapcheck/Containerfile.
+[Build]
+ImageTag=localhost/gapcheck:latest
+SetWorkingDirectory=%h/dev/site-adblock-gaps/tools/gapcheck
+File=Containerfile

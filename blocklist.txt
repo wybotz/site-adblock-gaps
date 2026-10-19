@@ -180,6 +180,15 @@
 ||choices.trustarc.com^
 ||choices.truste.com^
 
+! Added 2026-10-19 (gapcheck, reviewed), seen on Guardian
+! Microsoft/Bing cookie-sync pixel (/c.gif?Red3=CTOMS_pd) sent with the TCF consent string.
+! Host only: bing.com is search.
+||c.bing.com^
+
+! Added 2026-10-19 (gapcheck, reviewed), seen on Guardian (inside Google ad safeframes)
+! Prebid universal creative (creative.js) used to render header-bidding ads. Host only.
+||www.unpkg.com^
+
 ! Already covered elsewhere, no action needed (kept here for the record):
 ! a.teads.tv                     -> covered via ||teads.tv^
 ! amazon-adsystem.com            -> covered (||amazon-adsystem.com^)
@@ -220,6 +229,10 @@
 ! Added 2026-10-07 (gapcheck, reviewed), seen on DN
 ! Holid header bidding (helloworld., null.); AdGuard only lists ads. and ip.
 ||holid.io^
+
+! Added 2026-10-19 (gapcheck, reviewed), seen on DN (inside an ih.adscale.de ad frame)
+! Ströer cookie-match pixel (/stroer/cm) sent with the TCF consent string.
+||green.erne.co^
 
 ! =====================================================================
 ! Video ads: Google IMA SDK and DoubleClick video media — all sites

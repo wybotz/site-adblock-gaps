@@ -176,6 +176,9 @@ consent_labels = ["Okej"]
 "sch-map.norstatsurveys.com" = { note = "Norstat survey/panel measurement" }
 "prmutv.co" = { note = "Permutive identity sync (/pxid); permutive.app/.com are blocked, this domain isn't" }
 "loudecho.ai" = { note = "Ad-tech cookie/ID sync" }
+"c.bing.com" = { note = "Microsoft/Bing cookie-sync pixel (c.gif?Red3=CTOMS_pd)" }
+"www.unpkg.com" = { note = "Prebid universal creative (creative.js), loaded in Google ad safeframes" }
+"erne.co" = { note = "Ströer cookie-match pixel (/stroer/cm) in adscale.de ad frames" }
 "unagi-eu.amazon.com" = { note = "Amazon telemetry beacon" }
 "capi.connatix.com" = { note = "Connatix video-ad tracking" }
 "mediagotechnology.com" = { note = "Ad-tech tracking pixel" }

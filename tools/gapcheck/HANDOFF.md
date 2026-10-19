@@ -65,6 +65,20 @@ chronological order. This section is the current truth.
 - Writing `.py` checks inside `tools/gapcheck/` creates `__pycache__/`;
   run Python with `-B` or delete it afterwards (it isn't git-ignored).
 
+## Progress (2026-10-19, Claude Code session on rimmer)
+
+Judged the 2026-10-12 run (6 candidates). Committed, not pushed.
+
+- Accepted (3, reasons in `blocklist.txt`, notes in `gapcheck.toml`):
+  `c.bing.com` (cookie-sync pixel, Guardian), `www.unpkg.com` (Prebid
+  creative.js in Google ad safeframes, Guardian), `green.erne.co` (Ströer
+  cookie match in adscale.de frames, DN). Verified against the raw AdGuard DNS
+  filter; full URLs/frames from a probe (`out/probes/hosts6.py`).
+- **Still undecided** (not reproduced in 3 extra runs, so no URL/frame
+  evidence): `public-prod-dspcookiematching.dmxleo.com` (name says DSP cookie
+  matching), `static.zuuvicdn.com`, `amd-ab.akamaized.net`.
+- Blocklist now has 47 rules.
+
 ## Progress (2026-10-07, Claude Code session on Tobias's Mac)
 
 All of this is on the `gapcheck` branch, pushed to `origin`. `main` is
